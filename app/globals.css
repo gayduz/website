@@ -2,3 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
+.tiptap {
+    height: 100%;
+    padding: 8px;
+}
+
+body {
+    min-height: 100vh;
+}
+
+.App {
+    min-height: 100vh;
+}
