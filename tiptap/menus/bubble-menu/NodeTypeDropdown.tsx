@@ -1,6 +1,7 @@
 import { Editor } from "@tiptap/core";
 import { useState } from "react";
 import Tippy from "@tippyjs/react";
+import {MdArrowDropDown, MdCheck} from "react-icons/md";
 
 export const NodeTypeDropdown = ({ editor }: { editor: Editor }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -51,7 +52,7 @@ export const NodeTypeDropdown = ({ editor }: { editor: Editor }) => {
               <img src="/editor/text.png" width="24" height="24" alt="Text" />
               <span className="ml-1">Text</span>
             </div>
-            {isOnlyParagraph && <i className="i-mdi-check" />}
+            {isOnlyParagraph && <MdCheck />}
           </button>
           <button
             type="button"
@@ -70,7 +71,7 @@ export const NodeTypeDropdown = ({ editor }: { editor: Editor }) => {
               <span className="ml-1">Heading 1</span>
             </div>
             {editor.isActive("heading", { level: 1 }) && (
-              <i className="i-mdi-check" />
+              <MdCheck />
             )}
           </button>
           <button
@@ -90,7 +91,7 @@ export const NodeTypeDropdown = ({ editor }: { editor: Editor }) => {
               <span className="ml-1">Heading 2</span>
             </div>
             {editor.isActive("heading", { level: 2 }) && (
-              <i className="i-mdi-check" />
+              <MdCheck />
             )}
           </button>
           <button
@@ -110,7 +111,7 @@ export const NodeTypeDropdown = ({ editor }: { editor: Editor }) => {
               <span className="ml-1">Heading 3</span>
             </div>
             {editor.isActive("heading", { level: 3 }) && (
-              <i className="i-mdi-check" />
+              <MdCheck />
             )}
           </button>
           <button
@@ -127,7 +128,7 @@ export const NodeTypeDropdown = ({ editor }: { editor: Editor }) => {
               />
               <span className="ml-1">Numbered list</span>
             </div>
-            {editor.isActive("orderedList") && <i className="i-mdi-check" />}
+            {editor.isActive("orderedList") && <MdCheck />}
           </button>
           <button
             type="button"
@@ -143,7 +144,7 @@ export const NodeTypeDropdown = ({ editor }: { editor: Editor }) => {
               />
               <span className="ml-1">Bulleted list</span>
             </div>
-            {editor.isActive("bulletList") && <i className="i-mdi-check" />}
+            {editor.isActive("bulletList") && <MdCheck />}
           </button>
         </div>
       }
@@ -154,7 +155,7 @@ export const NodeTypeDropdown = ({ editor }: { editor: Editor }) => {
         onClick={() => setIsOpen(!isOpen)}
       >
         <span className="truncate">{buttonText()}</span>
-        <i className="i-mdi-chevron-down" />
+        <MdArrowDropDown size={16} />
       </button>
     </Tippy>
   );

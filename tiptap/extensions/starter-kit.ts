@@ -24,6 +24,7 @@ import { Paragraph } from "./paragraph";
 import { SuperchargedTableExtensions } from "./supercharged-table";
 import { ResizableMedia } from "./resizableMedia";
 import { TrailingNode } from "./trailingNode";
+import {Commands, suggestions} from "@/tiptap/extensions/slash-menu";
 
 export interface PlaceholderOptions {
   emptyEditorClass: string;
@@ -176,6 +177,10 @@ export const getExtensions = ({
 
         return "https://source.unsplash.com/8xznAGy4HcY/800x400";
       },
+    }),
+
+    Commands.configure({
+      suggestions,
     }),
 
     Placeholder.configure({

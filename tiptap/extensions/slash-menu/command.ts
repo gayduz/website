@@ -1,6 +1,7 @@
 import { Extension } from "@tiptap/core";
 import Suggestion from "@tiptap/suggestion";
 
+// @ts-expect-error
 export const Commands = Extension.create({
   name: "slash-commands",
 

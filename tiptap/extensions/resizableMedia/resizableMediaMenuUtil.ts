@@ -1,9 +1,12 @@
 /* @unocss-include */
 // import { IconAlignCenter, IconAlignLeft, IconAlignRight, IconFloatLeft, IconFloatRight, IconDelete } from '~/assets'
 
+import {MdDelete, MdFormatAlignCenter, MdFormatAlignLeft, MdFormatAlignRight} from "react-icons/md";
+import React from "react";
+
 interface ResizableMediaAction {
   tooltip: string;
-  icon?: string;
+  icon?: React.FC;
   action?: (updateAttributes: (o: Record<string, any>) => any) => void;
   isActive?: (attrs: Record<string, any>) => boolean;
   delete?: (d: () => void) => void;
@@ -17,7 +20,7 @@ export const resizableMediaActions: ResizableMediaAction[] = [
         dataAlign: "start",
         dataFloat: null,
       }),
-    icon: "i-mdi-format-align-left",
+    icon: MdFormatAlignLeft,
     isActive: (attrs) => attrs.dataAlign === "start",
   },
   {
@@ -27,7 +30,7 @@ export const resizableMediaActions: ResizableMediaAction[] = [
         dataAlign: "center",
         dataFloat: null,
       }),
-    icon: "i-mdi-format-align-center",
+    icon: MdFormatAlignCenter,
     isActive: (attrs) => attrs.dataAlign === "center",
   },
   {
@@ -37,12 +40,12 @@ export const resizableMediaActions: ResizableMediaAction[] = [
         dataAlign: "end",
         dataFloat: null,
       }),
-    icon: "i-mdi-format-align-right",
+    icon: MdFormatAlignRight,
     isActive: (attrs) => attrs.dataAlign === "end",
   },
   {
     tooltip: "Delete",
-    icon: "i-mdi-delete",
+    icon: MdDelete,
     delete: (deleteNode) => deleteNode(),
   },
 ];

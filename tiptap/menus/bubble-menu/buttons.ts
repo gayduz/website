@@ -1,11 +1,13 @@
 /* @unocss-include */
 import { Editor } from "@tiptap/react";
+import {MdFormatBold, MdFormatItalic} from "react-icons/md";
+import React from "react";
 
 interface BubbleMenuItem {
   tooltip: string;
   action: (editor: Editor) => boolean;
   isActive: (editor: Editor) => boolean;
-  iconClass: string;
+  icon: React.FC;
 }
 
 export const generalButtons: BubbleMenuItem[] = [
@@ -13,13 +15,13 @@ export const generalButtons: BubbleMenuItem[] = [
     tooltip: "Bold",
     action: (editor: Editor) => editor.chain().focus().toggleBold().run(),
     isActive: (editor: Editor) => editor.isActive("bold"),
-    iconClass: "i-ri-bold",
+    icon: MdFormatBold,
   },
   {
     tooltip: "Italic",
     action: (editor: Editor) => editor.chain().focus().toggleItalic().run(),
     isActive: (editor: Editor) => editor.isActive("italic"),
-    iconClass: "i-ri-italic",
+    icon: MdFormatItalic,
   },
   // {
   //   name: "underline",
