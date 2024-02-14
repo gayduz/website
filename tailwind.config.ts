@@ -6,6 +6,7 @@ const config: Config = {
 		"./components/**/*.{js,ts,jsx,tsx,mdx}",
 		"./app/**/*.{js,ts,jsx,tsx,mdx}",
 		"./tiptap/**/*.{js,ts,jsx,tsx,mdx}",
+		"./stories/**/*.{js,ts,jsx,tsx,mdx}",
 	],
 	theme: {
 		extend: {
@@ -19,8 +20,8 @@ const config: Config = {
 	plugins: [require("@tailwindcss/typography")],
 	safelist: [
 		{
-			pattern: /justify-(start|end)/
-		}
-	]
+			pattern: /justify-(start|end)/,
+		},
+	],
 };
 export default config;

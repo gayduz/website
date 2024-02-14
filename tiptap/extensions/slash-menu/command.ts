@@ -1,26 +1,26 @@
 import { Extension } from "@tiptap/core";
 import Suggestion from "@tiptap/suggestion";
 
-// @ts-expect-error
 export const Commands = Extension.create({
-  name: "slash-commands",
+	name: "slash-commands",
 
-  addOptions() {
-    return {
-      suggestions: {
-        char: "/",
-        command: ({ editor, range, props }: any) =>
-          props.command({ editor, range }),
-      },
-    };
-  },
+	addOptions() {
+		return {
+			suggestions: {
+				char: "/",
+				// biome-ignore lint/suspicious/noExplicitAny: TODO
+				command: ({ editor, range, props }: any) =>
+					props.command({ editor, range }),
+			},
+		};
+	},
 
-  addProseMirrorPlugins() {
-    return [
-      Suggestion({
-        editor: this.editor,
-        ...this.options.suggestions,
-      }),
-    ];
-  },
+	addProseMirrorPlugins() {
+		return [
+			Suggestion({
+				editor: this.editor,
+				...this.options.suggestions,
+			}),
+		];
+	},
 });

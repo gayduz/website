@@ -1,21 +1,21 @@
 import { NodeType, Schema } from "prosemirror-model";
 
 export function getTableNodeTypes(schema: Schema): { [key: string]: NodeType } {
-  if (schema.cached.tableNodeTypes) {
-    return schema.cached.tableNodeTypes;
-  }
+	if (schema.cached.tableNodeTypes) {
+		return schema.cached.tableNodeTypes;
+	}
 
-  const roles: { [key: string]: NodeType } = {};
+	const roles: { [key: string]: NodeType } = {};
 
-  Object.keys(schema.nodes).forEach((type) => {
-    const nodeType = schema.nodes[type];
+	for (const type of Object.keys(schema.nodes)) {
+		const nodeType = schema.nodes[type];
 
-    if (nodeType.spec.tableRole) {
-      roles[nodeType.spec.tableRole] = nodeType;
-    }
-  });
+		if (nodeType.spec.tableRole) {
+			roles[nodeType.spec.tableRole] = nodeType;
+		}
+	}
 
-  schema.cached.tableNodeTypes = roles;
+	schema.cached.tableNodeTypes = roles;
 
-  return roles;
+	return roles;
 }

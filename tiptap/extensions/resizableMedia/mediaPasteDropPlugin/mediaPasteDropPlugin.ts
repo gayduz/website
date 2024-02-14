@@ -3,118 +3,115 @@ import { Plugin, PluginKey } from "prosemirror-state";
 export type UploadFnType = (image: File) => Promise<string>;
 
 export const getMediaPasteDropPlugin = (upload: UploadFnType) => {
-  return new Plugin({
-    key: new PluginKey("media-paste-drop"),
-    props: {
-      handlePaste(view, event) {
-        const items = Array.from(event.clipboardData?.items || []);
-        const { schema } = view.state;
+	return new Plugin({
+		key: new PluginKey("media-paste-drop"),
+		props: {
+			handlePaste(view, event) {
+				const items = Array.from(event.clipboardData?.items || []);
+				const { schema } = view.state;
 
-        items.forEach((item) => {
-          const file = item.getAsFile();
+				for (const item of items) {
+					const file = item.getAsFile();
 
-          const isImageOrVideo =
-            file?.type.indexOf("image") === 0 ||
-            file?.type.indexOf("video") === 0;
+					const isImageOrVideo =
+						file?.type.indexOf("image") === 0 ||
+						file?.type.indexOf("video") === 0;
 
-          if (isImageOrVideo) {
-            event.preventDefault();
+					if (isImageOrVideo) {
+						event.preventDefault();
 
-            if (upload && file) {
-              upload(file).then((src) => {
-                const node = schema.nodes.resizableMedia.create({
-                  src,
-                  "media-type":
-                    file.type.indexOf("image") === 0 ? "img" : "video",
-                });
+						if (upload && file) {
+							upload(file).then((src) => {
+								const node = schema.nodes.resizableMedia.create({
+									src,
+									"media-type":
+										file.type.indexOf("image") === 0 ? "img" : "video",
+								});
 
-                const transaction = view.state.tr.replaceSelectionWith(node);
-                view.dispatch(transaction);
-              });
-            }
-          } else {
-            const reader = new FileReader();
+								const transaction = view.state.tr.replaceSelectionWith(node);
+								view.dispatch(transaction);
+							});
+						}
+					} else {
+						const reader = new FileReader();
 
-            reader.onload = (readerEvent) => {
-              const node = schema.nodes.resizableMedia.create({
-                src: readerEvent.target?.result,
-                "media-type": "",
-              });
+						reader.onload = (readerEvent) => {
+							const node = schema.nodes.resizableMedia.create({
+								src: readerEvent.target?.result,
+								"media-type": "",
+							});
 
-              const transaction = view.state.tr.replaceSelectionWith(node);
-              view.dispatch(transaction);
-            };
+							const transaction = view.state.tr.replaceSelectionWith(node);
+							view.dispatch(transaction);
+						};
 
-            if (!file) return;
+						if (!file) return;
 
-            reader.readAsDataURL(file);
-          }
-        });
+						reader.readAsDataURL(file);
+					}
+				}
 
-        return false;
-      },
-      handleDrop(view, event) {
-        const hasFiles =
-          event.dataTransfer &&
-          event.dataTransfer.files &&
-          event.dataTransfer.files.length;
+				return false;
+			},
+			async handleDrop(view, event) {
+				const hasFiles = event?.dataTransfer?.files?.length ?? false;
 
-        if (!hasFiles) {
-          return false;
-        }
+				if (!hasFiles) {
+					return false;
+				}
 
-        const imagesAndVideos = Array.from(
-          event.dataTransfer?.files ?? []
-        ).filter(({ type: t }) => /image|video/i.test(t));
+				const imagesAndVideos = Array.from(
+					event.dataTransfer?.files ?? [],
+				).filter(({ type: t }) => /image|video/i.test(t));
 
-        if (imagesAndVideos.length === 0) return false;
+				if (imagesAndVideos.length === 0) return false;
 
-        event.preventDefault();
+				event.preventDefault();
 
-        const { schema } = view.state;
+				const { schema } = view.state;
 
-        const coordinates = view.posAtCoords({
-          left: event.clientX,
-          top: event.clientY,
-        });
+				const coordinates = view.posAtCoords({
+					left: event.clientX,
+					top: event.clientY,
+				});
 
-        if (!coordinates) return false;
+				if (!coordinates) return false;
 
-        imagesAndVideos.forEach(async (imageOrVideo) => {
-          const reader = new FileReader();
+				for (const imageOrVideo of imagesAndVideos) {
+					const reader = new FileReader();
 
-          if (upload) {
-            const node = schema.nodes.resizableMedia.create({
-              src: await upload(imageOrVideo),
-              "media-type": imageOrVideo.type.includes("image")
-                ? "img"
-                : "video",
-            });
+					if (upload) {
+						const node = schema.nodes.resizableMedia.create({
+							src: await upload(imageOrVideo),
+							"media-type": imageOrVideo.type.includes("image")
+								? "img"
+								: "video",
+						});
 
-            const transaction = view.state.tr.insert(coordinates.pos, node);
+						const transaction = view.state.tr.insert(coordinates.pos, node);
 
-            view.dispatch(transaction);
-          } else {
-            reader.onload = (readerEvent) => {
-              const node = schema.nodes.resizableMedia.create({
-                src: readerEvent.target?.result,
+						view.dispatch(transaction);
+					} else {
+						reader.onload = (readerEvent) => {
+							const node = schema.nodes.resizableMedia.create({
+								src: readerEvent.target?.result,
 
-                "media-type": imageOrVideo.type.includes("image")
-                  ? "img"
-                  : "video",
-              });
+								"media-type": imageOrVideo.type.includes("image")
+									? "img"
+									: "video",
+							});
 
-              const transaction = view.state.tr.insert(coordinates.pos, node);
+							const transaction = view.state.tr.insert(coordinates.pos, node);
 
-              view.dispatch(transaction);
-            };
+							view.dispatch(transaction);
+						};
 
-            reader.readAsDataURL(imageOrVideo);
-          }
-        });
+						reader.readAsDataURL(imageOrVideo);
+					}
+				}
 
-        return true;
-      },
-    },
-  });
+				return true;
+			},
+		},
+	});
 };

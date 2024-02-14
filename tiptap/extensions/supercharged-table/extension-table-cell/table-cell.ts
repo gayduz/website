@@ -1,63 +1,64 @@
-import { mergeAttributes, Node } from "@tiptap/core";
+import { Node, mergeAttributes } from "@tiptap/core";
 import { ReactNodeViewRenderer } from "@tiptap/react";
 
 import { TableCellNodeView } from "./TableCellNodeView";
 
 export interface TableCellOptions {
-  HTMLAttributes: Record<string, any>;
+	// biome-ignore lint/suspicious/noExplicitAny: TODO
+	HTMLAttributes: Record<string, any>;
 }
 
 export const TableCell = Node.create<TableCellOptions>({
-  name: "tableCell",
+	name: "tableCell",
 
-  addOptions() {
-    return {
-      HTMLAttributes: {},
-    };
-  },
+	addOptions() {
+		return {
+			HTMLAttributes: {},
+		};
+	},
 
-  content: "block+",
+	content: "block+",
 
-  addAttributes() {
-    return {
-      colspan: {
-        default: 1,
-      },
-      rowspan: {
-        default: 1,
-      },
-      colwidth: {
-        default: null,
-        parseHTML: (element) => {
-          const colwidth = element.getAttribute("colwidth");
-          const value = colwidth ? [parseInt(colwidth, 10)] : null;
+	addAttributes() {
+		return {
+			colspan: {
+				default: 1,
+			},
+			rowspan: {
+				default: 1,
+			},
+			colwidth: {
+				default: null,
+				parseHTML: (element) => {
+					const colwidth = element.getAttribute("colwidth");
+					const value = colwidth ? [parseInt(colwidth, 10)] : null;
 
-          return value;
-        },
-      },
-    };
-  },
+					return value;
+				},
+			},
+		};
+	},
 
-  tableRole: "cell",
+	tableRole: "cell",
 
-  isolating: true,
+	isolating: true,
 
-  parseHTML() {
-    return [{ tag: "td" }];
-  },
+	parseHTML() {
+		return [{ tag: "td" }];
+	},
 
-  renderHTML({ HTMLAttributes }) {
-    return [
-      "td",
-      mergeAttributes(this.options.HTMLAttributes, HTMLAttributes),
-      0,
-    ];
-  },
+	renderHTML({ HTMLAttributes }) {
+		return [
+			"td",
+			mergeAttributes(this.options.HTMLAttributes, HTMLAttributes),
+			0,
+		];
+	},
 
-  addNodeView() {
-    return ReactNodeViewRenderer(TableCellNodeView, {
-      as: "td",
-      className: "relative",
-    });
-  },
+	addNodeView() {
+		return ReactNodeViewRenderer(TableCellNodeView, {
+			as: "td",
+			className: "relative",
+		});
+	},
 });

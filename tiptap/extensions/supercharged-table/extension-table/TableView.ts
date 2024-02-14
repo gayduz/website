@@ -3,105 +3,105 @@ import { Node as ProseMirrorNode } from "prosemirror-model";
 import { NodeView } from "prosemirror-view";
 
 export function updateColumns(
-  node: ProseMirrorNode,
-  colgroup: Element,
-  table: HTMLTableElement,
-  cellMinWidth: number,
-  overrideCol?: number,
-  overrideValue?: any
+	node: ProseMirrorNode,
+	colgroup: Element,
+	table: HTMLTableElement,
+	cellMinWidth: number,
+	overrideCol?: number,
+	// biome-ignore lint/suspicious/noExplicitAny: TODO
+	overrideValue?: any,
 ) {
-  let totalWidth = 0;
-  let fixedWidth = true;
-  let nextDOM = colgroup.firstChild;
-  const row = node.firstChild;
+	let totalWidth = 0;
+	let fixedWidth = true;
+	let nextDOM = colgroup.firstChild;
+	const row = node.firstChild;
 
-  if (row) {
-    for (let i = 0, col = 0; i < row.childCount; i += 1) {
-      const { colspan, colwidth } = row.child(i).attrs;
+	if (row) {
+		for (let i = 0, col = 0; i < row.childCount; i += 1) {
+			const { colspan, colwidth } = row.child(i).attrs;
 
-      for (let j = 0; j < colspan; j += 1, col += 1) {
-        const hasWidth =
-          overrideCol === col ? overrideValue : colwidth && colwidth[j];
-        const cssWidth = hasWidth ? `${hasWidth}px` : "";
+			for (let j = 0; j < colspan; j += 1, col += 1) {
+				const hasWidth = overrideCol === col ? overrideValue : colwidth?.[j];
+				const cssWidth = hasWidth ? `${hasWidth}px` : "";
 
-        totalWidth += hasWidth || cellMinWidth;
+				totalWidth += hasWidth || cellMinWidth;
 
-        if (!hasWidth) {
-          fixedWidth = false;
-        }
+				if (!hasWidth) {
+					fixedWidth = false;
+				}
 
-        if (!nextDOM) {
-          colgroup.appendChild(document.createElement("col")).style.width =
-            cssWidth;
-        } else {
-          if ((nextDOM as HTMLTableColElement).style.width !== cssWidth) {
-            (nextDOM as HTMLTableColElement).style.width = cssWidth;
-          }
+				if (!nextDOM) {
+					colgroup.appendChild(document.createElement("col")).style.width =
+						cssWidth;
+				} else {
+					if ((nextDOM as HTMLTableColElement).style.width !== cssWidth) {
+						(nextDOM as HTMLTableColElement).style.width = cssWidth;
+					}
 
-          nextDOM = nextDOM.nextSibling;
-        }
-      }
-    }
-  }
+					nextDOM = nextDOM.nextSibling;
+				}
+			}
+		}
+	}
 
-  while (nextDOM) {
-    const after = nextDOM.nextSibling;
+	while (nextDOM) {
+		const after = nextDOM.nextSibling;
 
-    nextDOM?.parentNode?.removeChild(nextDOM);
-    nextDOM = after;
-  }
+		nextDOM?.parentNode?.removeChild(nextDOM);
+		nextDOM = after;
+	}
 
-  if (fixedWidth) {
-    table.style.width = `${totalWidth}px`;
-    table.style.minWidth = "";
-  } else {
-    table.style.width = "";
-    table.style.minWidth = `${totalWidth}px`;
-  }
+	if (fixedWidth) {
+		table.style.width = `${totalWidth}px`;
+		table.style.minWidth = "";
+	} else {
+		table.style.width = "";
+		table.style.minWidth = `${totalWidth}px`;
+	}
 }
 
 export class TableView implements NodeView {
-  node: ProseMirrorNode;
+	node: ProseMirrorNode;
 
-  cellMinWidth: number;
+	cellMinWidth: number;
 
-  dom: Element;
+	dom: Element;
 
-  table: HTMLTableElement;
+	table: HTMLTableElement;
 
-  colgroup: Element;
+	colgroup: Element;
 
-  contentDOM: HTMLElement;
+	contentDOM: HTMLElement;
 
-  constructor(node: ProseMirrorNode, cellMinWidth: number) {
-    this.node = node;
-    this.cellMinWidth = cellMinWidth;
-    this.dom = document.createElement("div");
-    this.dom.className = "tableWrapper";
-    this.table = this.dom.appendChild(document.createElement("table"));
-    this.colgroup = this.table.appendChild(document.createElement("colgroup"));
-    updateColumns(node, this.colgroup, this.table, cellMinWidth);
-    this.contentDOM = this.table.appendChild(document.createElement("tbody"));
-  }
+	constructor(node: ProseMirrorNode, cellMinWidth: number) {
+		this.node = node;
+		this.cellMinWidth = cellMinWidth;
+		this.dom = document.createElement("div");
+		this.dom.className = "tableWrapper";
+		this.table = this.dom.appendChild(document.createElement("table"));
+		this.colgroup = this.table.appendChild(document.createElement("colgroup"));
+		updateColumns(node, this.colgroup, this.table, cellMinWidth);
+		this.contentDOM = this.table.appendChild(document.createElement("tbody"));
+	}
 
-  update(node: ProseMirrorNode) {
-    if (node.type !== this.node.type) {
-      return false;
-    }
+	update(node: ProseMirrorNode) {
+		if (node.type !== this.node.type) {
+			return false;
+		}
 
-    this.node = node;
-    updateColumns(node, this.colgroup, this.table, this.cellMinWidth);
+		this.node = node;
+		updateColumns(node, this.colgroup, this.table, this.cellMinWidth);
 
-    return true;
-  }
+		return true;
+	}
 
-  ignoreMutation(
-    mutation: MutationRecord | { type: "selection"; target: Element }
-  ) {
-    return (
-      mutation.type === "attributes" &&
-      (mutation.target === this.table ||
-        this.colgroup.contains(mutation.target))
-    );
-  }
+	ignoreMutation(
+		mutation: MutationRecord | { type: "selection"; target: Element },
+	) {
+		return (
+			mutation.type === "attributes" &&
+			(mutation.target === this.table ||
+				this.colgroup.contains(mutation.target))
+		);
+	}
 }
