@@ -11,7 +11,8 @@ import {
 
 interface ResizableMediaAction {
 	tooltip: string;
-	icon?: React.FC;
+	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+icon?: React.FC<any>;
 	// biome-ignore lint/suspicious/noExplicitAny: TODO
 	action?: (updateAttributes: (o: Record<string, any>) => any) => void;
 	// biome-ignore lint/suspicious/noExplicitAny: TODO

@@ -53,7 +53,7 @@ export const getMediaPasteDropPlugin = (upload: UploadFnType) => {
 
 				return false;
 			},
-			async handleDrop(view, event) {
+			handleDrop(view, event) {
 				const hasFiles = event?.dataTransfer?.files?.length ?? false;
 
 				if (!hasFiles) {
@@ -77,7 +77,8 @@ export const getMediaPasteDropPlugin = (upload: UploadFnType) => {
 
 				if (!coordinates) return false;
 
-				for (const imageOrVideo of imagesAndVideos) {
+				// biome-ignore lint/complexity/noForEach: required
+				imagesAndVideos.forEach(async (imageOrVideo) => {
 					const reader = new FileReader();
 
 					if (upload) {
@@ -108,7 +109,7 @@ export const getMediaPasteDropPlugin = (upload: UploadFnType) => {
 
 						reader.readAsDataURL(imageOrVideo);
 					}
-				}
+				});
 
 				return true;
 			},

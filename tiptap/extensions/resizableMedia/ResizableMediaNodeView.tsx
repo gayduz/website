@@ -253,7 +253,7 @@ export const ResizableMediaNodeView = ({
 										: btn.action?.(updateAttributes)
 								}
 							>
-								<btn.icon size={16} />
+								{btn.icon && <btn.icon size={16} />}
 							</button>
 						);
 					})}

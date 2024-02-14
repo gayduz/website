@@ -7,7 +7,8 @@ interface BubbleMenuItem {
 	tooltip: string;
 	action: (editor: Editor) => boolean;
 	isActive: (editor: Editor) => boolean;
-	icon: React.FC;
+	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+	icon: React.FC<any>;
 }
 
 export const generalButtons: BubbleMenuItem[] = [

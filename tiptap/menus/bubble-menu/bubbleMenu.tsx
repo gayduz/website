@@ -31,7 +31,7 @@ export const CustomBubbleMenu: React.FC<CustomBubbleMenuProps> = ({
 						onClick={() => btn.action(editor)}
 						key={btn.tooltip}
 					>
-						<btn.icon size={16} />
+						{btn.icon && <btn.icon size={16} />}
 					</button>
 				);
 			})}
