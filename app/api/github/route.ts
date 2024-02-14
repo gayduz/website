@@ -15,6 +15,10 @@ async function getSHA(path: string) {
 			path,
 		});
 
+		if (Array.isArray(data)) {
+			return undefined
+		}
+
 		return data.sha;
 	} catch {
 		return undefined;
