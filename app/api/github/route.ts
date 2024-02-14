@@ -26,19 +26,20 @@ async function getSHA(path: string) {
 }
 
 export async function GET() {
-	const { data: repo } = await octokit.rest.repos.get(repoConfig);
-	const { data: branch } = await octokit.rest.repos.getBranch({
-		...repoConfig,
-		branch: "main",
-	});
-	const r = await octokit.rest.repos.createOrUpdateFileContents({
-		...repoConfig,
-		path: "test2",
-		message: "Adding a shitt",
-		content: Buffer.from("i am file content?").toString("base64"),
-		sha: await getSHA("test2"),
-	});
-	console.log("finished");
-	// console.log('herererer', process.env.GITHUB_BOT_PERSONAL_TOKEN)
-	return NextResponse.json(r.data);
+	// const { data: repo } = await octokit.rest.repos.get(repoConfig);
+	// const { data: branch } = await octokit.rest.repos.getBranch({
+	// 	...repoConfig,
+	// 	branch: "main",
+	// });
+	// const r = await octokit.rest.repos.createOrUpdateFileContents({
+	// 	...repoConfig,
+	// 	path: "test2",
+	// 	message: "Adding a shitt",
+	// 	content: Buffer.from("i am file content?").toString("base64"),
+	// 	sha: await getSHA("test2"),
+	// });
+	// console.log("finished");
+	// // console.log('herererer', process.env.GITHUB_BOT_PERSONAL_TOKEN)
+	// return NextResponse.json(r.data);
+	return NextResponse.json('yes')
 }
