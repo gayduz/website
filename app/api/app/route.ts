@@ -16,7 +16,7 @@ async function getSHA(path: string) {
 		});
 
 		if (Array.isArray(data)) {
-			return undefined
+			return undefined;
 		}
 
 		return data.sha;
@@ -41,5 +41,5 @@ export async function GET() {
 	// console.log("finished");
 	// // console.log('herererer', process.env.GITHUB_BOT_PERSONAL_TOKEN)
 	// return NextResponse.json(r.data);
-	return NextResponse.json('yes')
+	return NextResponse.json("yes");
 }
