@@ -6,4 +6,5 @@ export type GithubAccessToken = {
 	scope: string;
 	token_type: string;
 	given_at: number;
+	installation_ids: number[];
 };
