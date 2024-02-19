@@ -2,9 +2,10 @@ import React from "react";
 import Sidebar from "../Sidebar";
 import Head from "next/head";
 
-const DefaultLayout: React.FC<{ children: React.ReactNode }> = ({
-	children,
-}) => {
+const DefaultLayout: React.FC<{
+	children: React.ReactNode;
+	sidebarChildren?: React.ReactNode;
+}> = ({ children, sidebarChildren }) => {
 	return (
 		<>
 			<Head>
@@ -13,7 +14,7 @@ const DefaultLayout: React.FC<{ children: React.ReactNode }> = ({
 				<link rel="icon" href="/favicon.ico" />
 			</Head>
 			<div className="flex">
-				<Sidebar />
+				<Sidebar>{sidebarChildren}</Sidebar>
 				<div className="h-screen overflow-y-auto flex-1">{children}</div>
 			</div>
 		</>

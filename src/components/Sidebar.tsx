@@ -5,7 +5,7 @@ import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuGroup,
-	DropdownMenuItem,
+	DropdownMenuCheckboxItem,
 	DropdownMenuLabel,
 	DropdownMenuPortal,
 	DropdownMenuSeparator,
@@ -17,6 +17,8 @@ import {
 import { Button } from "./ui/button";
 import _ from "lodash";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { useParams, useRouter } from "next/navigation";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "./ui/hover-card";
 
 const UserComponent: React.FC<{
 	user: RouterOutputs["user"]["user"];
@@ -64,13 +66,40 @@ const RepoComponent: React.FC<{
 		),
 	);
 
+	const router = useRouter();
+
+	const params = useParams<{
+		name?: string | string[];
+	}>();
+	const selectedRepoName = Array.isArray(params?.name)
+		? params.name.join("/")
+		: params?.name ?? "";
+
+	const selectedRepo = repos.find(
+		(repo) => repo.full_name === selectedRepoName,
+	);
+
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>
 				<div className="px-2 py-1">
-					<Button variant="outline" className="w-full">
-						Select repository
-					</Button>
+					<HoverCard>
+						<HoverCardTrigger asChild>
+							<Button variant="outline" className="w-full">
+								<div className="truncate">
+									{selectedRepo ? selectedRepo.full_name : "Select repository"}
+								</div>
+							</Button>
+						</HoverCardTrigger>
+						{selectedRepo && (
+							<HoverCardContent>
+								<div className="text-sm">{selectedRepo.full_name}</div>
+								{selectedRepo.description && (
+									<div className="text-xs mt-2">{selectedRepo.description}</div>
+								)}
+							</HoverCardContent>
+						)}
+					</HoverCard>
 				</div>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent className="w-56">
@@ -78,12 +107,20 @@ const RepoComponent: React.FC<{
 				<DropdownMenuSeparator />
 				<DropdownMenuGroup>
 					{groupedRepos.map(([organization, repos]) => (
-						<DropdownMenuSub>
+						<DropdownMenuSub key={organization}>
 							<DropdownMenuSubTrigger>{organization}</DropdownMenuSubTrigger>
 							<DropdownMenuPortal>
 								<DropdownMenuSubContent>
 									{repos.map((repo) => (
-										<DropdownMenuItem>{repo.name}</DropdownMenuItem>
+										<DropdownMenuCheckboxItem
+											key={repo.id}
+											checked={selectedRepo?.full_name === repo.full_name}
+											onCheckedChange={() =>
+												router.push(`/r/${repo.full_name}`)
+											}
+										>
+											{repo.name}
+										</DropdownMenuCheckboxItem>
 									))}
 								</DropdownMenuSubContent>
 							</DropdownMenuPortal>
@@ -95,11 +132,9 @@ const RepoComponent: React.FC<{
 	);
 };
 
-const Sidebar: React.FC = () => {
+const Sidebar: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
 	const u = api.user.user.useQuery();
 	const i = api.user.connectedRepos.useQuery();
-
-	console.log(i.data);
 
 	return (
 		<div className="w-[240px] h-screen bg-zinc-100 border-r flex-shrink-0">
@@ -109,6 +144,7 @@ const Sidebar: React.FC = () => {
 				</div>
 			)}
 			<RepoComponent repos={i?.data ?? []} />
+			{children}
 		</div>
 	);
 };
