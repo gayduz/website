@@ -72,7 +72,7 @@ const RepoComponent: React.FC<{
 		name?: string | string[];
 	}>();
 	const selectedRepoName = Array.isArray(params?.name)
-		? params.name.join("/")
+		? params.name.slice(0, 2).join("/")
 		: params?.name ?? "";
 
 	const selectedRepo = repos.find(

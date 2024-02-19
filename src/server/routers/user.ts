@@ -66,4 +66,35 @@ export const userRouter = createTRPCRouter({
 				files,
 			};
 		}),
+
+	getFile: protectedProcedure
+		.input(
+			z.object({
+				path: z.string(),
+				repo: z.string(),
+				branch: z.string(),
+			}),
+		)
+		.query(async ({ input, ctx: { userOctokit } }) => {
+			const { data: files } = await userOctokit.rest.git.getTree({
+				owner: input.repo.split("/")[0],
+				repo: input.repo.split("/")[1],
+				tree_sha: input.branch,
+				recursive: "1",
+			});
+
+			const fileMeta = files.tree.find((file) => file.path === input.path);
+
+			if (!fileMeta) {
+				throw new TRPCError({ code: "NOT_FOUND" });
+			}
+
+			const { data: file } = await userOctokit.rest.git.getBlob({
+				owner: input.repo.split("/")[0],
+				repo: input.repo.split("/")[1],
+				file_sha: fileMeta.sha!,
+			});
+
+			return file;
+		}),
 });

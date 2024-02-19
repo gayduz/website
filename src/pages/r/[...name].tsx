@@ -17,9 +17,12 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { RouterOutputs, api } from "@/utils/api";
 import _ from "lodash";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import React from "react";
 import { IconFolder, IconFile } from "@tabler/icons-react";
+
+import dynamic from "next/dynamic";
+const Tiptap = dynamic(async () => (await import("@/tiptap")).Tiptap);
 
 const BranchesComponent: React.FC<{
 	selectedBranchName?: string;
@@ -64,11 +67,19 @@ type FileTree = Record<
 	}
 >;
 
-const FileTreeComponent: React.FC<{ tree: FileTree }> = ({ tree }) =>
+const FileTreeComponent: React.FC<{
+	tree: FileTree;
+	onClick(path: string): void;
+}> = ({ tree, onClick }) =>
 	Object.entries(tree).map(([key, { value, children }]) =>
 		value.type === "blob" ? (
 			<div key={value.path}>
-				<Button size="sm" className="w-full justify-start" variant="outline">
+				<Button
+					size="sm"
+					className="w-full justify-start"
+					variant="outline"
+					onClick={() => onClick(value.path!)}
+				>
 					<IconFile size={16} className="mr-2 text-blue-600" />
 					{value.path?.split("/").slice(-1)}
 				</Button>
@@ -88,7 +99,7 @@ const FileTreeComponent: React.FC<{ tree: FileTree }> = ({ tree }) =>
 					</AccordionTrigger>
 					<AccordionContent className="py-0">
 						<div className="flex flex-col gap-2 pl-4 pt-2">
-							<FileTreeComponent tree={children} />
+							<FileTreeComponent tree={children} onClick={onClick} />
 						</div>
 					</AccordionContent>
 				</AccordionItem>
@@ -98,7 +109,8 @@ const FileTreeComponent: React.FC<{ tree: FileTree }> = ({ tree }) =>
 
 const FileExplorerComponent: React.FC<{
 	files: NonNullable<RouterOutputs["user"]["getRepo"]["files"]>["tree"];
-}> = ({ files }) => {
+	onClick(path: string): void;
+}> = ({ files, onClick }) => {
 	const data = files
 		.filter((f) => typeof f.path === "string")
 		.reduce((o, f) => {
@@ -118,7 +130,7 @@ const FileExplorerComponent: React.FC<{
 			</DrawerTrigger>
 			<DrawerContent>
 				<div className="flex flex-col gap-2 p-8">
-					<FileTreeComponent tree={data} />
+					<FileTreeComponent tree={data} onClick={onClick} />
 				</div>
 			</DrawerContent>
 		</Drawer>
@@ -133,10 +145,23 @@ const RepositoryPage: React.FC = () => {
 		? params.name.join("/")
 		: params?.name ?? "";
 
-	console.log(name);
+	const repoName = name.split("/").slice(0, 2).join("/");
+	const branchName = name.split("/").slice(2, 3).join("/");
+	const fileName = name.split("/").slice(3).join("/");
 
-	const repo = api.user.getRepo.useQuery({ name });
+	console.log(name, repoName);
+
+	const repo = api.user.getRepo.useQuery({ name: repoName });
+	const file = api.user.getFile.useQuery({
+		path: fileName,
+		repo: repoName,
+		branch: branchName,
+	});
+
 	console.log("repo", repo.data);
+	console.log("file", file.data);
+
+	const router = useRouter();
 
 	return (
 		<DefaultLayout
@@ -150,12 +175,17 @@ const RepositoryPage: React.FC = () => {
 					)}
 
 					{repo.data && (
-						<FileExplorerComponent files={repo.data.files?.tree ?? []} />
+						<FileExplorerComponent
+							files={repo.data.files?.tree ?? []}
+							onClick={(path: string) =>
+								router.push(`/r/${repoName}/${repo.data.branch?.name}/${path}`)
+							}
+						/>
 					)}
 				</div>
 			}
 		>
-			e
+			<Tiptap content={file.data?.content} />
 		</DefaultLayout>
 	);
 };

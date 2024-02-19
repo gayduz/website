@@ -9,9 +9,10 @@ import "tippy.js/animations/shift-toward-subtle.css";
 
 import { getExtensions } from "./extensions";
 import { CustomBubbleMenu, LinkBubbleMenu } from "./menus";
-import { content } from "./mocks";
 
-export const Tiptap = () => {
+export const Tiptap: React.FC<{ content?: string }> = ({
+	content: originContent,
+}) => {
 	const logContent = React.useCallback(
 		(e: Editor) => console.log(e.getJSON()),
 		[],
@@ -48,7 +49,7 @@ export const Tiptap = () => {
 
 	const editor = useEditor({
 		extensions: getExtensions({ openLinkModal }),
-		content,
+		content: "",
 		editorProps: {
 			attributes: {
 				class:
@@ -61,6 +62,16 @@ export const Tiptap = () => {
 			logContent(e);
 		}, 500),
 	});
+
+	React.useEffect(() => {
+		if (editor) {
+			editor.commands.setContent(atob(originContent ?? ""));
+		}
+	}, [editor, originContent]);
+
+	React.useEffect(() => {
+		return () => editor?.destroy?.();
+	}, [editor]);
 
 	const addTable = () =>
 		editor?.commands.insertTable({ rows: 3, cols: 3, withHeaderRow: true });
