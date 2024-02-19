@@ -2,6 +2,9 @@ import { createNextApiHandler } from "@trpc/server/adapters/next";
 
 import { appRouter } from "@/server/root";
 import { createTRPCContext } from "@/server/context";
+import { ResponseMeta } from "@trpc/server/http";
+import cookie from "cookie";
+import { HTTPHeaders } from "@trpc/client";
 
 // export API handler
 export default createNextApiHandler({
@@ -15,4 +18,16 @@ export default createNextApiHandler({
 					);
 			  }
 			: undefined,
+	responseMeta(opts) {
+		const headers: HTTPHeaders = {};
+
+		if (opts.ctx?.encryptedToken) {
+			headers["set-cookie"] = cookie.serialize(
+				"token",
+				opts.ctx.encryptedToken,
+			);
+		}
+
+		return { headers };
+	},
 });
