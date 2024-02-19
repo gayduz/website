@@ -8,17 +8,22 @@ export const userRouter = createTRPCRouter({
 	user: protectedProcedure.query(async ({ ctx: { user } }) => {
 		return user;
 	}),
-	connectedRepos: protectedProcedure.query(async ({ ctx: { app, token } }) => {
-		const repos: RestEndpointMethodTypes["apps"]["listReposAccessibleToInstallation"]["response"]["data"]["repositories"] =
-			[];
+	connectedRepos: protectedProcedure.query(
+		async ({ ctx: { app, token, userOctokit } }) => {
+			const repos: RestEndpointMethodTypes["apps"]["listReposAccessibleToInstallation"]["response"]["data"]["repositories"] =
+				[];
 
-		for (const installationId of token?.installation_ids ?? []) {
-			const i = await app.getInstallationOctokit(installationId);
-			const a = await i.rest.apps.listReposAccessibleToInstallation();
-			// console.log(a.data);
-			repos.push(...a.data.repositories);
-		}
+			const installations = (
+				await userOctokit.request("GET /user/installations")
+			).data.installations;
 
-		return repos;
-	}),
+			for (const installation of installations) {
+				const i = await app.getInstallationOctokit(installation.id);
+				const a = await i.rest.apps.listReposAccessibleToInstallation();
+				repos.push(...a.data.repositories);
+			}
+
+			return repos;
+		},
+	),
 });

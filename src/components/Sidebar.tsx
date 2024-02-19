@@ -1,6 +1,22 @@
 import { RouterOutputs, api } from "@/utils/api";
 import React from "react";
 import { IconBrandGithub } from "@tabler/icons-react";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuGroup,
+	DropdownMenuItem,
+	DropdownMenuLabel,
+	DropdownMenuPortal,
+	DropdownMenuSeparator,
+	DropdownMenuSub,
+	DropdownMenuSubContent,
+	DropdownMenuSubTrigger,
+	DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
+import { Button } from "./ui/button";
+import _ from "lodash";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 
 const UserComponent: React.FC<{
 	user: RouterOutputs["user"]["user"];
@@ -12,7 +28,18 @@ const UserComponent: React.FC<{
 			target="_blank"
 			rel="noreferrer"
 		>
-			<img src={user.avatar_url} alt={user.login} className="w-8 rounded" />
+			<Avatar className="rounded w-8 h-8">
+				<AvatarImage src={user.avatar_url} />
+				<AvatarFallback>
+					{user.name
+						? user.name
+								.split(" ")
+								.map((v) => v[0])
+								.slice(0, 2)
+								.join("")
+						: user.login.slice(0, 2)}
+				</AvatarFallback>
+			</Avatar>
 			<div className="text-xs truncate">@{user.login}</div>
 		</a>
 	);
@@ -29,17 +56,44 @@ const LoginComponent: React.FC = () => (
 );
 
 const RepoComponent: React.FC<{
-	repo: RouterOutputs["user"]["connectedRepos"][number];
-}> = ({ repo }) => (
-	<a
-		href={`https://github.com/${repo.full_name}`}
-		target="_blank"
-		rel="noreferrer"
-		className="flex gap-2 p-2 text-xs bg-white border rounded items-center"
-	>
-		{repo.full_name}
-	</a>
-);
+	repos: RouterOutputs["user"]["connectedRepos"];
+}> = ({ repos }) => {
+	const groupedRepos = Object.entries(
+		_.groupBy(repos, (repo) =>
+			repo.full_name.split("/").slice(0, -1).join("/"),
+		),
+	);
+
+	return (
+		<DropdownMenu>
+			<DropdownMenuTrigger asChild>
+				<div className="px-2 py-1">
+					<Button variant="outline" className="w-full">
+						Select repository
+					</Button>
+				</div>
+			</DropdownMenuTrigger>
+			<DropdownMenuContent className="w-56">
+				<DropdownMenuLabel>Connected repositories</DropdownMenuLabel>
+				<DropdownMenuSeparator />
+				<DropdownMenuGroup>
+					{groupedRepos.map(([organization, repos]) => (
+						<DropdownMenuSub>
+							<DropdownMenuSubTrigger>{organization}</DropdownMenuSubTrigger>
+							<DropdownMenuPortal>
+								<DropdownMenuSubContent>
+									{repos.map((repo) => (
+										<DropdownMenuItem>{repo.name}</DropdownMenuItem>
+									))}
+								</DropdownMenuSubContent>
+							</DropdownMenuPortal>
+						</DropdownMenuSub>
+					))}
+				</DropdownMenuGroup>
+			</DropdownMenuContent>
+		</DropdownMenu>
+	);
+};
 
 const Sidebar: React.FC = () => {
 	const u = api.user.user.useQuery();
@@ -54,13 +108,7 @@ const Sidebar: React.FC = () => {
 					{u.data ? <UserComponent user={u.data} /> : <LoginComponent />}
 				</div>
 			)}
-			{!i.isLoading && (
-				<div className="flex flex-col px-2 mt-2 gap-1">
-					{i.data!.map((repo) => (
-						<RepoComponent repo={repo} />
-					))}
-				</div>
-			)}
+			<RepoComponent repos={i?.data ?? []} />
 		</div>
 	);
 };
